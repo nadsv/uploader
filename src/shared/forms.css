@@ -1,0 +1,57 @@
+.formGroup {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.8em;
+}
+
+.field {
+    outline: none;
+    border: 1px solid #ccc;
+    background-color: white;
+    font: inherit;
+    font-size: 0.8em;
+    padding: 8.5px 10px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.field:focus {
+    outline: none;
+    background-color: #deebff;
+}
+
+.invalid {
+    font-style: italic;
+    font-size: 0.8em;
+    margin: 0;
+    padding: 3px;
+    color: #DD2C00;
+}
+
+input[type=file]::-webkit-file-upload-button {
+  visibility: hidden;
+  width: 0;
+  padding:0;
+  margin:0;
+}
+
+.info {
+  font-size: 0.7em;
+  font-style: italic;
+  margin-left: 10px;
+}
+
+@media (min-width: 600px) {
+    .wrapper {
+        width: 500px;
+        margin: 0 auto;
+    }
+}

@@ -1,0 +1,8 @@
+.Select {
+  font-size: 0.8em;
+  background-color: red !important;
+}
+
+.react-select__control {
+  background-color: red !important;
+}

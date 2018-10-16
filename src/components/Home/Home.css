@@ -1,0 +1,22 @@
+.home {
+  list-style: none;
+  padding: 45px 0 0 0;
+  margin-top: 20px;
+}
+
+.home__item {
+  font-size: 2em;
+  margin-bottom: 20px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.home__item a{
+  color: #546E7A;
+  text-decoration: none;
+}
+
+.home__item a:hover{
+  color: #263238;
+  text-decoration: underline;
+}

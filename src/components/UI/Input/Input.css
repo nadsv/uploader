@@ -1,0 +1,41 @@
+.Input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.Label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.8em;
+}
+
+.InputElement {
+    outline: none;
+    border: 1px solid #ccc;
+    background-color: white;
+    font: inherit;
+    font-size: 0.8em;
+    padding: 6px 10px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.InputElement:focus {
+    outline: none;
+    background-color: #E0F2F1;
+}
+
+.Invalid {
+    border: 1px solid red;
+    background-color: #FDA49A;
+}
+
+input[type=file]::-webkit-file-upload-button {
+  visibility: hidden;
+  width: 0;
+  padding:0;
+  margin:0;
+}
