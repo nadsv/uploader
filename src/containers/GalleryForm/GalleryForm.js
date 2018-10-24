@@ -1,12 +1,11 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 
-class GalleryForm extends Component {
 
-  render() {
-    return (<div>
-      Breaking news
-      </div>);
+export default class GalleryForm extends Component {
+
+  render () {
+    return (
+      <p>Gallery</p>
+    );
   }
 }
-
-export default GalleryForm;

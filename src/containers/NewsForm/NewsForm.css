@@ -1,0 +1,13 @@
+.editor:focus :global(.RichTextEditor__editor___1QqIU .public-DraftEditor-content){
+    outline: none;
+    background-color: #deebff;
+}
+
+:global(.RichTextEditor__editor___1QqIU .public-DraftEditor-content) {
+  min-height: 200px;
+}
+
+:global(.RichTextEditor__root___2QXK-) {
+  border-radius: 0;
+  border: 1px solid #ccc;
+}
