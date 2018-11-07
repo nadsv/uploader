@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { convertToRaw, convertFromRaw, convertFromHTML, ContentState } from 'draft-js';
+import { convertToRaw } from 'draft-js';
 import RichTextEditor from 'react-rte';
-import PropTypes from 'prop-types';
 
 import { withFormik, Form } from 'formik';
 import * as Yup from 'yup';
 
 import Spinner from '../../components/UI/Spinner/Spinner';
 import Button from '../../components/UI/Button/Button';
-import DelModal from '../../components/UI/DelModal/DelModal';
 import Uselect from '../../components/UI/Uselect/Uselect';
-import FileLoader from '../../containers/FileLoader/FileLoader';
+import MultipleFileLoader from '../../components/UI/MultipleFileLoader/MultipleFileLoader';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import axios from '../../uploader-axios';
 import classes from '../../shared/forms.css';
@@ -21,23 +19,24 @@ import './NewsForm.css';
 const formikEnhancer = withFormik({
   mapPropsToValues(props) {
       return {
-        newsName: props.newsName || '',
+        docName: props.docName || '',
         date: props.date || '',
         user: props.user || '',
         hidden: props.hidden || '',
-        text: props.text || null
+        text: props.text || null,
+        fileNames: props.fileNames || []
       }
     },
 
   validationSchema: Yup.object().shape({
-    newsName: Yup.string().min(10, 'Заголовок должен содержать не менее 5 символов.').required('Заголовок не заполнен.'),
+    docName: Yup.string().min(5, 'Заголовок должен содержать не менее 5 символов.').required('Заголовок не заполнен.'),
     user: Yup.string().min(5, 'ФИО должны содержать более 5 символов.').required('ФИО не заполнены.'),
     date: Yup.date().required('Дата не заполнена.'),
     text: Yup.object().test(
         'text',
         'Текст новости не заполнен.',
         value => { if (value.blocks[0].text) {return true} else {return false} }
-      ).required('Текст новости не заполнен.'),
+      ),
     hidden: Yup.mixed().test(
         'category',
         'Отображение не заполнено.',
@@ -50,12 +49,36 @@ const valuesInUselect = [{value: 'Да', label: 'Да'}, {value: 'Нет', label
 
 class NewsForm extends Component {
 
- state = {
-      deleting: false,
-      text: RichTextEditor.createEmptyValue()
+  constructor(props) {
+    super(props);
+    this.state = {
+         deleting: false,
+         text: RichTextEditor.createEmptyValue(),
+         files: []
+     }
   }
 
+  componentDidMount() {
+      if (this.props.news) {
+        this.props.setFieldValue('docName', this.props.news.docName)
+        this.props.setFieldValue('user', this.props.news.user)
+        const pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
+        const dt = new Date(this.props.news.date.replace(pattern,'$3-$2-$1'));
+        this.props.setFieldValue('date', dt.toISOString().substring(0,10))
+        this.props.setFieldValue('hidden', this.props.news.hidden)
+        this.props.setFieldValue('fileNames', this.props.news.fileNames)
+        this.filesWithLinks = this.props.news.fileNames
+        let text = this.state.text;
+        this.setState({
+          text: text.setContentFromString(JSON.stringify(this.props.news.text), 'raw'),
+        });
+        //this.props.setFieldValue('text', text.setContentFromString(JSON.stringify(this.props.news.text), 'raw'));
+    }
+  }
 
+  componentWillUnmount() {
+    this.props.onInitNews(null);
+  }
 
   onChangeText = (text) => {
     this.setState( { text } );
@@ -73,26 +96,47 @@ class NewsForm extends Component {
     this.props.setFieldValue('text', rawContentState);
   }
 
-  testHandler = () => {
-    const json = '{"entityMap":{},"blocks":[{"key":"f7339","text":"New value","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}]}';
-    let { text } = this.state;
-    this.setState({
-      text: text.setContentFromString(json, 'raw'),
-    });
+  handleFilesAddition = (files, fileNames) => {
+      this.setState( { files });
+      this.props.setFieldValue('fileNames', fileNames);
   }
 
+  handleFilesDeletion = (files, fileNames) => {
+      this.setState( { files });
+      this.props.setFieldValue('fileNames', fileNames);
+  }
 
   submitHandler = ( event ) => {
-        event.preventDefault();
-        console.log('submit news');
-  }
-
-  cancelDeleteHandler = () => {
-    console.log('cancel deleting news');
-  }
-
-  confirmDeleteHandler = () => {
-    console.log('confirm deleting news');
+      event.preventDefault();
+      const formData = new FormData()
+      let newsData = { ...this.props.values }
+      newsData.id = (this.props.news) ? this.props.news.id : ''
+      newsData.folder = (this.props.news) ? this.props.news.folder : ''
+      newsData.html = this.state.text.toString('html')
+      formData.append('news', JSON.stringify(newsData));
+      let i = 0;
+      for (const file of this.state.files) {
+          formData.append('file' + i, file)
+          i++;
+      }
+      this.props.onOperationStart();
+      axios.post('api/save-news.php', formData)
+           .then((response)=>{
+              const docData = {...this.props.values,
+                                  id: response.data.id.$id || this.props.news.id,
+                                  folder: response.data.folder || newsData.folder
+                              }
+              this.props.onNewsSaveSuccess(docData);
+              const newData = { ...docData };
+              newData.category = {label: 'Новость', value: 'news'}
+              newData.subCategory = {label: 'Новость', value: 'news'}
+              newData.date = this.props.news.date.replace(/(\d{4})-(\d{2})-(\d{2})/,'$3.$2.$1')
+              this.props.onSearchingUpdateItem( newData );
+              this.filesWithLinks = this.props.values.fileNames
+           }).catch((error)=> {
+              this.props.onOperationFail();
+              console.log(error)
+           });
   }
 
   render() {
@@ -109,8 +153,6 @@ class NewsForm extends Component {
       setFieldTouched
     } = this.props;
 
-
-
     let form =   <Form onSubmit={this.submitHandler}>
         <div className={classes.formGroup}>
           <label className={classes.label}>Дата</label>
@@ -126,13 +168,13 @@ class NewsForm extends Component {
         </div>
         <div className={classes.formGroup}>
           <label className={classes.label}>Заголовок</label>
-          <textarea name="newsName"
+          <textarea name="docName"
             className={classes.field}
-            value={values.newsName}
+            value={values.docName}
             onChange={handleChange}
             onBlur={handleBlur}
             rows="3"/>
-            { touched.newsName && errors.newsName && <p className={classes.invalid}>{errors.newsName}</p> }
+            { touched.docName && errors.docName && <p className={classes.invalid}>{errors.docName}</p> }
         </div>
         <div className={classes.formGroup}>
           <label className={classes.label}>Текст</label>
@@ -170,33 +212,49 @@ class NewsForm extends Component {
           />
           { touched.hidden && errors.hidden && <p className={classes.invalid}>{errors.hidden}</p> }
         </div>
+        <div className={classes.formGroup}>
+          <label className={classes.label}>Прикрепленные файлы</label>
+          <MultipleFileLoader
+            Add = { this.handleFilesAddition }
+            Delete = { this.handleFilesDeletion }
+            fileNames = { this.props.values.fileNames }
+            link = { (this.props.news) ?  this.props.path + this.props.news.folder : ''}
+          />
+          { errors.fileNames && <p className={classes.invalid}>{errors.fileNames}</p> }
+        </div>
         <Button btnType="Success"
                 type="submit"
                 disabled={!dirty || isSubmitting || !isValid}>
           Сохранить документ
         </Button>
-        <Button btnType="Success"
-                type="button"
-                clicked={this.testHandler}>
-         Testing
-        </Button>
-        {/*this.props.doc && <Button btnType="Success" type="button" clicked={this.deleteHandler}>
-                            Удалить новость
-                           </Button>}
-        {this.props.doc && this.props.doc.date && <p className={classes.info}>Новость добавлена {this.props.doc.date}</p>*/}
     </Form>
     if ( this.props.loading ) {
         form = <Spinner />
     }
     return <div className={classes.wrapper}>
-       <DelModal show={this.state.deleting}
-                 cancelHandler={this.cancelDeleteHandler}
-                 confirmHandler={this.confirmDeleteHandler}>
-       </DelModal>
        {form}
      </div>
  ;
 }
 }
 
-export default connect(null, null)(withErrorHandler( (formikEnhancer(NewsForm)), axios ));
+const mapStateToProps = state => {
+    return {
+        error: state.news.error,
+        loading: state.news.loading,
+        news: state.news.news,
+        path: state.news.path
+    };
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        onOperationStart: () => dispatch({type: actionTypes.OPERATION_START}),
+        onOperationFail: () => dispatch({type: actionTypes.OPERATION_FAIL}),
+        onNewsSaveSuccess: (data) => dispatch({type: actionTypes.SAVE_NEWS_SUCCESS, data: data}),
+        onInitNews: (data) => dispatch({type: actionTypes.INIT_NEWS, data: data}),
+        onSearchingUpdateItem: (docData) => dispatch({type: actionTypes.SEARCHING_UPDATE_ITEM, docData: docData})
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler( (formikEnhancer(NewsForm)), axios ));

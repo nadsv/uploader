@@ -28,7 +28,7 @@ const formikEnhancer = withFormik({
     category: Yup.mixed().test(
         'category',
         'Не заполнена категория.',
-        value => { if ((value !== undefined ) && value.link === '') {return false} else {return true} }
+        item => { if (item.value === '' )  {return false} else {return true} }
       ).required('Не заполнена категория.')
   })
 });
@@ -51,6 +51,8 @@ class SearchingParams extends Component {
       for (const key in this.props.params) {
          this.props.setFieldValue(key, this.props.params[key])
       }
+    } else {
+      this.props.setFieldValue('category', {value: 'news', label: 'Новость'});
     }
   }
 
@@ -82,7 +84,7 @@ class SearchingParams extends Component {
        const updatedSubCategories = ctgs.filter(cat => cat.link === link)[0].subCategory.map(
          (cat) => ({value: cat.link, label: cat.name})
        );
-       this.setState({subCategories: updatedSubCategories});
+       this.setState({subCategories: [{label: '', value: ''}].concat(updatedSubCategories)});
      } else {
        this.setState({subCategories: []});
      }
@@ -210,8 +212,8 @@ class SearchingParams extends Component {
 const mapStateToProps = state => {
     return {
         categories: state.doc.categories,
-        error: state.doc.error,
-        loading: state.doc.loading,
+        error: state.searching.error,
+        loading: state.searching.loading,
         items: state.searching.items,
         docPath: state.searching.path,
         params: state.searching.params

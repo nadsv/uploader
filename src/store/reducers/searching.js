@@ -4,6 +4,7 @@ import { updateObject } from '../../shared/utility';
 const initialState = {
     items: null,
     loading: false,
+    resultsLoading: false,
     error: false,
     params: null
 };
@@ -11,6 +12,7 @@ const initialState = {
 const findItemsSuccess = ( state, action ) => {
     return updateObject( state, {
         loading: false,
+        resultsLoading: false,
         error: false,
         items: action.items
     } );
@@ -25,11 +27,11 @@ const searchingInit = (state, action) => {
 }
 
 const searchingStart = ( state, action ) => {
-    return updateObject( state, { loading: true } );
+    return updateObject( state, { resultsLoading: true } );
 };
 
 const searchingFail = ( state, action ) => {
-    return updateObject( state, { error: true, loading: false } );
+    return updateObject( state, { error: true, resultsLoading: false } );
 };
 
 const searchingRemoveItem = (state, action) => {

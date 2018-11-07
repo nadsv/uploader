@@ -1,0 +1,44 @@
+.btn {
+  margin-left: -10px;
+  margin-top: -10px;
+}
+
+.fileList {
+  margin: 0;
+  padding-left: 17px;
+  font-size: 0.8em;
+  list-style-type: square;
+}
+
+.item {
+  cursor: pointer;
+  padding-bottom: 5px;
+}
+
+.delBtn {
+  visibility:hidden;
+  opacity:0;
+  transition: opacity 0.6s ease-out;
+}
+
+.item a {
+  text-decoration: none;
+  color: #2684FF;
+}
+
+.item:hover a {
+  text-decoration: underline;
+}
+
+.item:hover .delBtn {
+  visibility:visible;
+  opacity:1;
+  margin-left: 15px;
+  background-color: #B0BEC5;
+  color: white;
+  padding: 0 4px;
+}
+
+.item:hover .delBtn:hover {
+  background-color: #DD2C00;
+}

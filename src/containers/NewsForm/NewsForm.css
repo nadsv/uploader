@@ -11,3 +11,8 @@
   border-radius: 0;
   border: 1px solid #ccc;
 }
+
+:global(.DraftEditor-editorContainer) {
+  font-family: Arial;
+  font-size: 0.8em;
+}
