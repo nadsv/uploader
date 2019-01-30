@@ -130,7 +130,7 @@ class Doc extends Component {
           formData.append('file', this.tempFile);
           if (this.props.doc) {formData.append('id', this.props.doc.id);}
           this.props.onOperationStart();
-          axios.post('api/save-doc.php', formData)
+          axios.post('api/save-doc.php?XDEBUG_SESSION_START=netbeans-xdebug', formData)
                .then((response)=>{
                   const docData = {...this.props.values,
                                       id: response.data.id.$id || this.props.doc.id,
@@ -270,6 +270,7 @@ class Doc extends Component {
                    cancelHandler={this.cancelDeleteHandler}
                    confirmHandler={this.confirmDeleteHandler}>
          </DelModal>
+         <h1>Документ</h1>
          {form}
        </div>
    ;

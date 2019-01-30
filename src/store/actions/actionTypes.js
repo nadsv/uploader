@@ -19,3 +19,8 @@ export const INIT_DOC = 'INIT_DOC';
 
 export const SAVE_NEWS_SUCCESS = 'SAVE_NEWS_SUCCESS';
 export const INIT_NEWS = 'INIT_NEWS';
+
+export const SAVE_GALLERY_SUCCESS = 'SAVE_NEWS_SUCCESS';
+export const INIT_GALLERY = 'INIT_NEWS';
+export const DELETE_GALLERY_PHOTO = 'DELETE_GALLERY_PHOTO';
+export const DELETE_GALLERY = 'DELETE_GALLERY';

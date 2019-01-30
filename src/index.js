@@ -10,11 +10,13 @@ import registerServiceWorker from './registerServiceWorker';
 import doc from './store/reducers/document';
 import searching from './store/reducers/searching';
 import news from './store/reducers/news';
+import gallery from './store/reducers/gallery';
 
 const rootReducer = combineReducers({
     doc,
     searching,
-    news
+    news,
+    gallery
 });
 
 const store = createStore(rootReducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());

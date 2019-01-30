@@ -14,13 +14,12 @@ class MultipleFileLoader extends PureComponent {
       fileNames: [],
       message: ''
     };
-    this.filesWithLinks = [];
   }
 
   onAdd = (event) => {
-    const size_is_large = Object.values(event.target.files).filter(file => file.size > 5242880*2).length > 0;
+    const size_is_large = Object.values(event.target.files).filter(file => file.size > 5242880*6).length > 0;
     if (size_is_large) {
-      this.setState({ message: 'Список содержит файл размером более 10МБ!' });
+      this.setState({ message: 'Список содержит файл размером более 30МБ!' });
       return
     }
     const fileNames =  Object.values(event.target.files).map(file => file.name).concat(this.state.fileNames);
@@ -45,27 +44,21 @@ class MultipleFileLoader extends PureComponent {
     this.setState({message: ''})
   }
 
-  componentDidUpdate(prevProps) {
-    this.setState({fileNames: this.props.fileNames});
-    this.filesWithLinks = this.props.fileNames;
-  }
-
   componentDidMount() {
-    this.setState({fileNames: this.props.fileNames});
-    this.filesWithLinks = this.props.fileNames;
+    this.setState({fileNames: this.props.filesWithLinks});
   }
 
   render() {
     const list = this.state.fileNames.map((item, index)=>{
-      let file = this.filesWithLinks.includes(item) ? <a href={this.props.link + '/' + item} target="_blank">{item}</a>: item;
+      let file = this.props.filesWithLinks.includes(item) ? <a href={this.props.link + '/' + item} target="_blank">{item}</a>: item;
       return (<li key={item} className={classes.item}>
-        { file }
-        <span className={classes.delBtn}
-              onClick={ () => this.onDelete(index, item) }>
-        x
-        </span>
-      </li>)
-   });
+          { file }
+          <span className={classes.delBtn}
+                onClick={ () => this.onDelete(index, item) }>
+          x
+          </span>
+        </li>)
+    });
 
     return (<React.Fragment>
       <ErrorModal show={this.state.message}

@@ -56,6 +56,7 @@ class NewsForm extends Component {
          text: RichTextEditor.createEmptyValue(),
          files: []
      }
+     this.filesWithLinks = []
   }
 
   componentDidMount() {
@@ -67,7 +68,7 @@ class NewsForm extends Component {
         this.props.setFieldValue('date', dt.toISOString().substring(0,10))
         this.props.setFieldValue('hidden', this.props.news.hidden)
         this.props.setFieldValue('fileNames', this.props.news.fileNames)
-        this.filesWithLinks = this.props.news.fileNames
+
         let text = this.state.text;
         this.setState({
           text: text.setContentFromString(JSON.stringify(this.props.news.text), 'raw'),
@@ -131,8 +132,7 @@ class NewsForm extends Component {
               newData.category = {label: 'Новость', value: 'news'}
               newData.subCategory = {label: 'Новость', value: 'news'}
               newData.date = this.props.news.date.replace(/(\d{4})-(\d{2})-(\d{2})/,'$3.$2.$1')
-              this.props.onSearchingUpdateItem( newData );
-              this.filesWithLinks = this.props.values.fileNames
+              this.props.onSearchingUpdateItem( newData )
            }).catch((error)=> {
               this.props.onOperationFail();
               console.log(error)
@@ -217,7 +217,7 @@ class NewsForm extends Component {
           <MultipleFileLoader
             Add = { this.handleFilesAddition }
             Delete = { this.handleFilesDeletion }
-            fileNames = { this.props.values.fileNames }
+            filesWithLinks = { (this.props.news) ? this.props.news.fileNames : [] }
             link = { (this.props.news) ?  this.props.path + this.props.news.folder : ''}
           />
           { errors.fileNames && <p className={classes.invalid}>{errors.fileNames}</p> }
@@ -232,6 +232,7 @@ class NewsForm extends Component {
         form = <Spinner />
     }
     return <div className={classes.wrapper}>
+       <h1>Новость</h1>
        {form}
      </div>
  ;

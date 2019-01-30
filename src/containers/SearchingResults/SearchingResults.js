@@ -14,6 +14,10 @@ class SearchingResults extends Component {
         this.props.history.push('/news')
         this.props.onInitNews(item)
         break;
+      case 'Галерея':
+          this.props.history.push('/gallery')
+          this.props.onInitNews(item)
+          break;
       default:
         this.props.onInitDoc(item)
         this.props.history.push('/document')
