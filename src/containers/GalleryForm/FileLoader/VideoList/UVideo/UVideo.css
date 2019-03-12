@@ -1,0 +1,39 @@
+.video {
+  padding: 3px 3px 0 3px;
+  border: 1px solid #ccc;
+  position: relative;
+}
+
+.delete {
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.delete:hover {
+  border: 1px solid red;
+  background-color: red;
+}
+
+.delete:before, .delete:after {
+  position: absolute;
+  left: 6px;
+  top: 1px;
+  content: ' ';
+  height: 12px;
+  width: 2px;
+  background-color: #ccc;
+}
+
+.delete:before {
+  transform: rotate(45deg);
+}
+
+.delete:after {
+  transform: rotate(-45deg);
+}

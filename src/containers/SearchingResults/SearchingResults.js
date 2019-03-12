@@ -16,7 +16,7 @@ class SearchingResults extends Component {
         break;
       case 'Галерея':
           this.props.history.push('/gallery')
-          this.props.onInitNews(item)
+          this.props.onInitGallery(item)
           break;
       default:
         this.props.onInitDoc(item)
@@ -65,6 +65,7 @@ const mapDispatchToProps = dispatch => {
     return {
         onInitDoc: (item) => dispatch({type: actionTypes.INIT_DOC, item: item}),
         onInitNews: (item) => dispatch({type: actionTypes.INIT_NEWS, item: item}),
+        onInitGallery: (item) => dispatch({type: actionTypes.INIT_GALLERY, item: item})
     }
 }
 

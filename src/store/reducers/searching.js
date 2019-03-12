@@ -35,7 +35,7 @@ const searchingFail = ( state, action ) => {
 };
 
 const searchingRemoveItem = (state, action) => {
-    let array = state.items.filter(item => item.id!==action.id );
+    let array = (state.items) ? state.items.filter(item => item.id!==action.id ) : null;
     return updateObject( state, { items: array } );
 };
 

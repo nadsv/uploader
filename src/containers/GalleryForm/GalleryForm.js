@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import Button from '../../components/UI/Button/Button';
 import DelModal from '../../components/UI/DelModal/DelModal';
+import FileLoader from './FileLoader/FileLoader';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import axios from '../../uploader-axios';
 import classes from '../../shared/forms.css';
@@ -80,6 +81,7 @@ class GalleryForm extends Component {
             };
          }).catch((error)=> {
             this.props.onOperationFail();
+            console.log(error)
          });
   }
 
@@ -95,7 +97,9 @@ class GalleryForm extends Component {
     axios.post('api/save-gallery.php', formData)
          .then((response)=>{
             const docData = {...this.props.values,
-                                id: response.data.id.$id || this.props.gallery.id
+                                id: response.data.id.$id || this.props.gallery.id,
+                                images: response.data.images || [],
+                                video: response.data.video || []
                             }
             this.props.onGallerySaveSuccess(docData);
             const newData = { ...docData };
@@ -117,9 +121,7 @@ class GalleryForm extends Component {
       isValid,
       isSubmitting,
       handleChange,
-      handleBlur,
-      setFieldValue,
-      setFieldTouched
+      handleBlur
     } = this.props;
 
     let form =   <Form onSubmit={this.submitHandler}>
@@ -142,7 +144,7 @@ class GalleryForm extends Component {
             value={values.docName}
             onChange={handleChange}
             onBlur={handleBlur}
-            rows="3"/>
+            rows="2"/>
             { touched.docName && errors.docName && <p className={classes.invalid}>{errors.docName}</p> }
         </div>
         <div className={classes.formGroup}>
@@ -169,14 +171,18 @@ class GalleryForm extends Component {
     if ( this.props.loading ) {
         form = <Spinner />
     }
-    return <div className={classes.wrapper}>
+    return (
+    <React.Fragment>
+          <div className={classes.wrapper}>
             <DelModal show={this.state.deleting}
               cancelHandler={this.cancelDeleteHandler}
               confirmHandler={this.confirmDeleteHandler}>
             </DelModal>
             <h1>Фотогалерея</h1>
             {form}
-     </div>
+          </div>
+          {this.props.gallery && <FileLoader />}
+     </React.Fragment>)
  ;
 }
 }
@@ -198,7 +204,6 @@ const mapDispatchToProps = dispatch => {
         onInitGallery: (data) => dispatch({type: actionTypes.INIT_GALLERY, data: data}),
         onSearchingUpdateItem: (docData) => dispatch({type: actionTypes.SEARCHING_UPDATE_ITEM, docData: docData}),
         onGalleryDeleteSuccess: () => dispatch({type: actionTypes.DELETE_GALLERY}),
-        onPhotoDeleteSuccess: (data) => dispatch({type: actionTypes.DELETE_GALLERY_PHOTO, data: data}),
         onSearchingRemoveItem: (id) => dispatch({type: actionTypes.SEARCHING_REMOVE_ITEM, id: id})
     }
 }
