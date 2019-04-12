@@ -130,7 +130,7 @@ class Doc extends Component {
           formData.append('file', this.tempFile);
           if (this.props.doc) {formData.append('id', this.props.doc.id);}
           this.props.onOperationStart();
-          axios.post('api/save-doc.php?XDEBUG_SESSION_START=netbeans-xdebug', formData)
+          axios.post('api/save-doc.php', formData)
                .then((response)=>{
                   const docData = {...this.props.values,
                                       id: response.data.id.$id || this.props.doc.id,
