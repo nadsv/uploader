@@ -10,6 +10,7 @@ import Spinner from '../../components/UI/Spinner/Spinner';
 import Button from '../../components/UI/Button/Button';
 import Uselect from '../../components/UI/Uselect/Uselect';
 import MultipleFileLoader from '../../components/UI/MultipleFileLoader/MultipleFileLoader';
+import NewsImageLoader from '../../components/UI/NewsImageLoader/NewsImageLoader';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import axios from '../../uploader-axios';
 import classes from '../../shared/forms.css';
@@ -24,7 +25,8 @@ const formikEnhancer = withFormik({
         user: props.user || '',
         hidden: props.hidden || '',
         text: props.text || null,
-        fileNames: props.fileNames || []
+        fileNames: props.fileNames || [],
+        image: props.image || ''
       }
     },
 
@@ -57,6 +59,7 @@ class NewsForm extends Component {
          files: []
      }
      this.filesWithLinks = []
+     this.image = null
   }
 
   componentDidMount() {
@@ -67,6 +70,7 @@ class NewsForm extends Component {
         const dt = new Date(this.props.news.date.replace(pattern,'$3-$2-$1'));
         this.props.setFieldValue('date', dt.toISOString().substring(0,10))
         this.props.setFieldValue('hidden', this.props.news.hidden)
+        this.props.setFieldValue('image', this.props.news.image)
         this.props.setFieldValue('fileNames', this.props.news.fileNames)
 
         let text = this.state.text;
@@ -107,6 +111,15 @@ class NewsForm extends Component {
       this.props.setFieldValue('fileNames', fileNames);
   }
 
+  imageChangeHandler = (image) => {
+    this.image = image
+    if (image) {
+      this.props.setFieldValue('image', 'image');
+    } else {
+      this.props.setFieldValue('image', '');
+    }
+  }
+
   submitHandler = ( event ) => {
       event.preventDefault();
       const formData = new FormData()
@@ -120,6 +133,7 @@ class NewsForm extends Component {
           formData.append('file' + i, file)
           i++;
       }
+      if (this.image || this.image==='') { formData.append('image', this.image) }
       this.props.onOperationStart();
       axios.post('api/save-news.php', formData)
            .then((response)=>{
@@ -221,6 +235,15 @@ class NewsForm extends Component {
             link = { (this.props.news) ?  this.props.path + this.props.news.folder : ''}
           />
           { errors.fileNames && <p className={classes.invalid}>{errors.fileNames}</p> }
+        </div>
+        <div className={classes.formGroup}>
+          <label className={classes.label}>Изображение</label>
+          <NewsImageLoader
+              show = {(this.props.news) ? this.props.news.image : ''}
+              imageChangeHandler = { this.imageChangeHandler }
+              link = { (this.props.news) ?  this.props.path + this.props.news.folder + '/image.jpeg' : ''}
+          />
+          { errors.image && <p className={classes.invalid}>{errors.image}</p> }
         </div>
         <Button btnType="Success"
                 type="submit"
